@@ -1,0 +1,77 @@
+https://www.youtube.com/@AprendaGo
+
+https://go.dev/play/p/gXIyBBepmLj
+https://go.dev/play/p/Ulpxi4PO8nO
+Arr & slices: https://go.dev/play/p/YUcXZfzlVs_0
+slices 2D: https://play.golang.org/p/vKyHiG1GtM
+slices 3D: https://play.golang.org/p/ZSU_8eJ9Yp
+Maps: https://go.dev/play/p/eJksyBebWcD
+Manipulando Maps: https://go.dev/play/p/SI6cmnxdW2Z
+Desafios: https://go.dev/play/p/49bBQsBAQUC
+
+struct: https://go.dev/play/p/M2hNGWjWenC
+Desafios struct: https://go.dev/play/p/4FiWAp3AA9h
+
+Function: https://go.dev/play/p/NsLj-xGMHwx
+Defer: https://go.dev/play/p/afcnEi9BaiL
+Metodos: https://go.dev/play/p/tiFj0gTCZkn
+Interfaces: https://go.dev/play/p/LBHhiAR65oZ
+funcao anonima: https://go.dev/play/p/3aFtSiipePk
+funcao como expressao https://go.dev/play/p/5ySr1oV34aN
+Callback: https://go.dev/play/p/DRZYm9m6_wx
+Closures: https://go.dev/play/p/bIPxtbltZLo
+exercicios funcao: https://go.dev/play/p/OXXiK77B53w
+Polimorfismo: https://go.dev/play/p/Ce8rnx4GNP4
+
+ponteiro: https://play.golang.com/p/huBcJim_RUu
+exercicios ponteiro: https://play.golang.com/p/2aFT9UXHOEU
+
+Marshal: https://go.dev/play/p/SBe7B7JHaIx
+Exercicio Marshal: https://go.dev/play/p/NU3hG2xqdvx
+Encoder: https://go.dev/play/p/kgosTdlu7aG
+Exercicio Encoder: https://go.dev/play/p/cNa6RX7YP6u
+
+
+Default Sort: https://go.dev/play/p/SxO12Ujn0j3
+Exercicio Default Sort: https://go.dev/play/p/M8FDdKE-t6l
+My Sort: https://go.dev/play/p/DryqcKZ_kmB
+bcrypt: https://go.dev/play/p/I0pOQ04Rkf3
+
+GoRotine: https://go.dev/play/p/TDuPSz6H-Lv
+Condicao de Corrida: https://www.youtube.com/watch?v=0qGILXmLfMM&list=PLCKpcjBB_VlBsxJ9IseNxFllf-UFEXOdg&index=127
+exercicios https://go.dev/play/p/2yEaGE5QRU1
+exercicio conjuntos de métodos: https://go.dev/play/p/pWXmVfPzoW2
+
+Mutex -> https://go.dev/play/p/rmPumXQVep5
+
+Canais: https://www.youtube.com/watch?v=vYYHoKLb_8I&list=PLCKpcjBB_VlBsxJ9IseNxFllf-UFEXOdg&index=147
+https://go.dev/play/p/MC6wfb--YwF
+- geral pra específico: https://play.golang.org/p/H1uk4YGMBB
+- específico pra específico: https://play.golang.org/p/8JkOnEi7-a 
+- específico pra geral: https://play.golang.org/p/4sOKuQRHq7
+- atribuição tipos !=: https://play.golang.org/p/bG7H6l03VQ 
+
+Range e close: https://go.dev/play/p/g5zCEPVrzHy
+
+Select: 
+https://go.dev/play/p/WZ03zAEqlOr
+comma ok: fecha as condicoes do select
+https://go.dev/play/p/V8PpWqX1IlW 
+
+Convergencia: 
+https://go.dev/play/p/sdozFm8_36T
+https://go.dev/play/p/Jypo3oqNeJV
+https://go.dev/play/p/-SVDV7CdbSE
+
+Divergencia 
+https://go.dev/play/p/edFnnYuNKHs
+https://go.dev/play/p/Lkx4LEuA3mh
+
+Context
+https://www.youtube.com/watch?v=PhTtrrsUH8c&list=PLCKpcjBB_VlBsxJ9IseNxFllf-UFEXOdg&index=153
+
+Exercicios:
+https://go.dev/play/p/9Ij0SPna00o
+https://go.dev/play/p/QHxrG8UEiuq
+https://go.dev/play/p/J-Se3WNNJX_n
+https://go.dev/play/p/iMkWrSLx1mU
