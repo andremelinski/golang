@@ -1,12 +1,16 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
-	"io"
 	"log"
 	"net"
+	"time"
 )
 
+// to read from a connection u need a go function
+// go run main and at cmd telnet localhost 8080. Every time you write on the cmd, it will appear
+// on the vsCode terminal
 func main() {
 	listener, err := net.Listen("tcp", ":8080")
 	if err != nil {
@@ -19,10 +23,29 @@ func main() {
 			log.Println(err)
 			continue
 		}
-		io.WriteString(conn, "\nHello from TCP server\n")
-		fmt.Fprintln(conn, "How is your day?")
-		fmt.Fprintf(conn, "%v", "Well, I hope!")
-
-		conn.Close()
+		go handle(conn)
 	}
+
+}
+func handle(connection net.Conn) {
+	setTimeOut := connection.SetDeadline(time.Now().Add(10 * time.Second))
+
+	if setTimeOut != nil {
+		log.Fatalln("CONN TIMEOUT")
+	}
+
+	scanner := bufio.NewScanner(connection)
+	scanner.Split(bufio.ScanWords)
+	for scanner.Scan() {
+		// will scan and it'll continue to give me a line each time it scans.
+		ln := scanner.Text()
+		fmt.Println(ln)
+		fmt.Fprintf(connection, "I heard you say: %s\n", ln)
+	}
+	defer connection.Close()
+
+	// we never get here
+	// we have an open stream http connection, scanner.Scan will never close
+	// after 10s connection is closed and code got here appears
+	fmt.Println("Code got here.")
 }
