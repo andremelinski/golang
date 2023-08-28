@@ -48,7 +48,6 @@ func request(conn net.Conn) {
 		}
 
 		if i == 0 {
-
 			// request line
 			fields := strings.Fields(ln)
 			fmt.Println("***METHOD", fields[0])
