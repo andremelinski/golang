@@ -1,0 +1,2 @@
+https://dev.to/harshmangalam/image-upload-using-golang-and-react-29n1
+https://programmingeeksclub.com/rest-api-to-upload-image-in-golang/ 
