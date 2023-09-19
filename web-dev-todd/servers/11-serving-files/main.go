@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -73,6 +72,7 @@ func createPhoto(res http.ResponseWriter, req *http.Request, _ httprouter.Params
 			break
 		}
 		// https://freshman.tech/snippets/go/reset-file-pointer/
+		// as we've read 1024 bytes its necessary to restart the file pointer
 		_, err = file.Seek(0, io.SeekStart)
 		if err != nil {
 			errNew = err.Error()
@@ -89,7 +89,10 @@ func createPhoto(res http.ResponseWriter, req *http.Request, _ httprouter.Params
 
 		//creating empty file with final file name, date now and same file extension
 		fileName := strings.ReplaceAll(strings.Split(fileHeader.Filename, ".")[0], " ", "_")
-		newFile, err := os.Create(fmt.Sprintf("./uploads/%v%d%s", fileName, time.Now().UnixNano(), filepath.Ext(fileHeader.Filename)))
+		// newFile, err := os.Create(fmt.Sprintf("./uploads/%v%d%s", fileName, time.Now().UnixNano(), filepath.Ext(fileHeader.Filename)))
+		// OR
+		newFile, err := os.Create(filepath.Join("./uploads/", fileName, string(time.Now().UnixNano()), filepath.Ext(fileHeader.Filename)))
+
 		if err != nil {
 			errNew = err.Error()
 			http_status = http.StatusBadRequest
@@ -99,7 +102,7 @@ func createPhoto(res http.ResponseWriter, req *http.Request, _ httprouter.Params
 
 		_, err = io.Copy(newFile, file)
 		if err != nil {
-			errNew = err.Error()
+			errNew = err.Error() 
 			http_status = http.StatusBadRequest
 			break
 		}
