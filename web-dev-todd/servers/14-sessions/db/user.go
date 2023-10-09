@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -58,18 +57,27 @@ func CreateUser(res http.ResponseWriter, req *http.Request, _ httprouter.Params)
 	// }
 
 	user := findUSerByName(userData.Name)
+	fmt.Println(user)
+	userId := user.Id
 	if user.Id == "" {
-		user = appendUser(userData)
+		newUser, err := appendUser(userData)
+		if err!=nil {
+			http.Error(res, isValid.Error(), 500)
+			return
+		}
+		fmt.Println(newUser)
+		userId = newUser.Id
+
 	}
 	http.SetCookie(res, &http.Cookie{
 		Name: "session-id",
-		Value: user.Id,
+		Value: userId,
 		MaxAge: 10,
 	})
 
 	// res.WriteHeader(http.StatusCreated)
 	// json.NewEncoder(res).Encode(userData)
-	http.Redirect(res, req, "/login", 300)
+	// http.Redirect(res, req, "/login", 300)
 }
 
 func SignUp(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -92,7 +100,7 @@ func SignUp(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	http.Redirect(res, req, "/login", 300)
 }
 
-func findUSerByName(name string) IUserPropsDB  {
+func findUSerByName(name string) *IUserPropsDB  {
 	foundUser := IUserPropsDB{}
 	for _, user := range userArr {
 		if user.Name == name {
@@ -100,10 +108,10 @@ func findUSerByName(name string) IUserPropsDB  {
 			break
 		}
 	}
-	return foundUser
+	return &foundUser
 }
 
-func findUSerByCookieId(id string) IUserPropsDB  {
+func findUSerByCookieId(id string) *IUserPropsDB  {
 	foundUser := IUserPropsDB{}
 	for _, user := range userArr {
 		if user.Id == id {
@@ -111,18 +119,18 @@ func findUSerByCookieId(id string) IUserPropsDB  {
 			break
 		}
 	}
-	return foundUser
+	return &foundUser
 }
 
-func appendUser(userData IUserProps) IUserPropsDB{
+func appendUser(userData IUserProps) (*IUserPropsDB, error){
 	hashedPassword, err :=  bcrypt.GenerateFromPassword([]byte(userData.Password), bcrypt.MinCost); 
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 	userData.Password = string(hashedPassword)
 	newUser := IUserPropsDB{uuid.NewString(), userData}
 	userArr = append(userArr, newUser)	
-	return newUser
+	return &newUser, nil
 }
 
 func validator[T IUserProps](dataObj T)error{
