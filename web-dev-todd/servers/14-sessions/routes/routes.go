@@ -14,7 +14,7 @@ func HandleRequests() {
 	mux.POST("/", db.CreateUser)
 	mux.GET("/", db.SignUp)
 	mux.GET("/login", login)
-	mux.GET("/logout", logout)
+	mux.GET("/logout", db.Logout)
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }
 
@@ -27,8 +27,3 @@ func login(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	}
 	json.NewEncoder(res).Encode("Hello you are logged in")
 }
-
-func logout(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	json.NewEncoder(res).Encode("Hello you are logged out")
-}
-

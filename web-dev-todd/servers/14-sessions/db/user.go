@@ -102,9 +102,14 @@ func SignUp(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	userFound = findUSerByName(userData.Name)
 	
+	if userFound.Id == "" {
+		http.Error(res, "Username do not match", http.StatusForbidden)
+		return
+	}
+
 	err := bcrypt.CompareHashAndPassword([]byte(userFound.Password), []byte(userData.Password))
 	if err != nil {
-		http.Error(res, "Username and/or password do not match", http.StatusForbidden)
+		http.Error(res, "Password do not match", http.StatusForbidden)
 		return
 	}
 
@@ -115,6 +120,29 @@ func SignUp(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	})
 
 	http.Redirect(res, req, "/login", 300)
+}
+
+func Logout(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	userFound:= alreadyLoggedIn(req)
+
+	if(userFound.Id == ""){
+		res.WriteHeader(http.StatusOK)
+		json.NewEncoder(res).Encode("logout")
+		return
+	}
+	c, _ := req.Cookie("session-id")
+
+	// remove the cookie
+	c = &http.Cookie{
+		Name:   "session-id",
+		Value:  "",
+		MaxAge: -1,
+	}
+	http.SetCookie(res, c)
+
+	res.WriteHeader(http.StatusOK)
+		json.NewEncoder(res).Encode("logout")
+		return
 }
 
 func findUSerByName(name string) *IUserPropsDB  {
