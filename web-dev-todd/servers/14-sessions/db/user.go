@@ -2,7 +2,6 @@ package db
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -19,6 +18,11 @@ type IUserProps struct {
 	Password string `json:"password" valid:"notnull"`
 	Age   int `json:"age" valid:"notnull"`
 	Smoke bool `json:"smoke" valid:"-"`
+}
+
+type IUserLogin struct {
+	Name  string `json:"name" valid:"notnull"`
+	Password string `json:"password" valid:"notnull"`
 }
 
 type IUserPropsDB struct {
@@ -50,53 +54,66 @@ func CreateUser(res http.ResponseWriter, req *http.Request, _ httprouter.Params)
 		http.Error(res, isValid.Error(), 500)
 		return
 	}
-	// if(!isValid){
-	// 	res.WriteHeader(http.StatusBadRequest)
-	// 	json.NewEncoder(res).Encode("Keys alowed: "+ strings.Join(checkerKeysObj["user"]," "))
-	// 	return
-	// }
 
 	user := findUSerByName(userData.Name)
-	fmt.Println(user)
 	userId := user.Id
-	if user.Id == "" {
-		newUser, err := appendUser(userData)
-		if err!=nil {
-			http.Error(res, isValid.Error(), 500)
-			return
-		}
-		fmt.Println(newUser)
-		userId = newUser.Id
-
+	if user.Id != "" {
+		res.WriteHeader(http.StatusForbidden)
+		json.NewEncoder(res).Encode("user already exist")
+		return
 	}
+	
+	newUser, err := appendUser(userData)
+	if err!=nil {
+		http.Error(res, isValid.Error(), 500)
+		return
+	}
+	userId = newUser.Id
 	http.SetCookie(res, &http.Cookie{
 		Name: "session-id",
 		Value: userId,
 		MaxAge: 10,
 	})
 
-	// res.WriteHeader(http.StatusCreated)
-	// json.NewEncoder(res).Encode(userData)
-	// http.Redirect(res, req, "/login", 300)
+	http.Redirect(res, req, "/login", 300)
 }
 
 func SignUp(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	cookie, err := req.Cookie("session-id")
-	if err == http.ErrNoCookie {
-		//  http.Error(res, err.Error(), 500)
-		fmt.Println( err.Error())
-		http.Redirect(res, req, "/logout", 300)
-		return
-	}
-	userFound := findUSerByCookieId(cookie.Value)
+	userFound:= alreadyLoggedIn(req)
 
-	if(userFound.Id == ""){
-		res.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(res).Encode("user not Found")
+	if(userFound.Id != ""){
+		http.Redirect(res, req, "/login", 300)
 		return
 	}
-	// res.WriteHeader(http.StatusCreated)
-	// json.NewEncoder(res).Encode(userFound)
+
+	reqBody, _ := io.ReadAll(req.Body)
+
+	userData := IUserLogin{}
+	if err := json.Unmarshal(reqBody, &userData); err != nil {
+        http.Error(res, err.Error(), 500)
+		return
+    }
+
+	isValid := validator[IUserLogin](userData)
+	if(isValid!=nil){
+		http.Error(res, isValid.Error(), 500)
+		return
+	}
+
+	userFound = findUSerByName(userData.Name)
+	
+	err := bcrypt.CompareHashAndPassword([]byte(userFound.Password), []byte(userData.Password))
+	if err != nil {
+		http.Error(res, "Username and/or password do not match", http.StatusForbidden)
+		return
+	}
+
+	http.SetCookie(res, &http.Cookie{
+		Name: "session-id",
+		Value: userFound.Id,
+		MaxAge: 10,
+	})
+
 	http.Redirect(res, req, "/login", 300)
 }
 
@@ -133,11 +150,16 @@ func appendUser(userData IUserProps) (*IUserPropsDB, error){
 	return &newUser, nil
 }
 
-func validator[T IUserProps](dataObj T)error{
-	// v := reflect.ValueOf(	dataObj)
-	// keysToCheck := checkerKeysObj[keyToCheck]
+func alreadyLoggedIn(req *http.Request) *IUserPropsDB {
+	c, err := req.Cookie("session")
+	if err != nil {
+		return nil
+	}
+	user := findUSerByCookieId(c.Value)
+	return user
+}
 
-	// return v.NumField() == len(keysToCheck)
+func validator[T any](dataObj T)error{
 	_, err := govalidator.ValidateStruct(dataObj)
 	if err!=nil{
 		return err
