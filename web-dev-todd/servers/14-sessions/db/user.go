@@ -81,7 +81,7 @@ func CreateUser(res http.ResponseWriter, req *http.Request, _ httprouter.Params)
 func SignUp(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	userFound:= alreadyLoggedIn(req)
 
-	if(userFound.Id != ""){
+	if(userFound != nil){
 		http.Redirect(res, req, "/login", 300)
 		return
 	}
@@ -125,7 +125,7 @@ func SignUp(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 func Logout(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	userFound:= alreadyLoggedIn(req)
 
-	if(userFound.Id == ""){
+	if(userFound == nil){
 		res.WriteHeader(http.StatusOK)
 		json.NewEncoder(res).Encode("logout")
 		return
@@ -179,12 +179,11 @@ func appendUser(userData IUserProps) (*IUserPropsDB, error){
 }
 
 func alreadyLoggedIn(req *http.Request) *IUserPropsDB {
-	c, err := req.Cookie("session")
+	c, err := req.Cookie("session-id")
 	if err != nil {
 		return nil
 	}
-	user := findUSerByCookieId(c.Value)
-	return user
+	return findUSerByCookieId(c.Value)
 }
 
 func validator[T any](dataObj T)error{

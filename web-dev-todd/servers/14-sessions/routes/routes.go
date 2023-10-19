@@ -22,7 +22,8 @@ func HandleRequests() {
 func login(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	_, err := req.Cookie("session-id")
 	if err == http.ErrNoCookie {
-		 http.Redirect(res, req, "/logout", 300)
+		//  http.Redirect(res, req, "/logout", 300)
+		json.NewEncoder(res).Encode("logged out")
 		return
 	}
 	json.NewEncoder(res).Encode("Hello you are logged in")
