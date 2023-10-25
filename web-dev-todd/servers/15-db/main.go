@@ -25,7 +25,7 @@ type IAlbumDB struct{
 
 type IAlbumRepository interface{
     CreateAlbum()
-    GetAllAlbuns()
+    GetAllAlbums()
     GetAlbumById()
     UpdateAlbum()
     DeleteAlbum()
@@ -67,7 +67,7 @@ func main() {
 func HandleRequests(){
     mux := httprouter.New()
 	mux.POST("/", CreateAlbum)
-	// mux.GET("/", GetAllAlbuns)
+	mux.GET("/", GetAllAlbums)
 	// mux.GET("/album/:id", GetAlbumById)
     // mux.PUT("/album/:id", UpdateAlbum)
 	// mux.DELETE("/album/:id", DeleteAlbum)
@@ -97,7 +97,18 @@ func CreateAlbum(res http.ResponseWriter, req *http.Request, _ httprouter.Params
     res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusOK)
 	json.NewEncoder(res).Encode(newAlbumId)
+}
 
+func GetAllAlbums(res http.ResponseWriter, req *http.Request, _ httprouter.Params){
+
+    albums, err := DbLoadAllAlbums()
+    if(err != nil) {
+        http.Error(res, err.Error(), 500)
+        return 
+    }
+    res.Header().Set("Content-Type", "application/json")
+	res.WriteHeader(http.StatusOK)
+	json.NewEncoder(res).Encode(albums)
 }
 
 func (albumData IAlbumProps)DbCreateAlbm()(int64, error){
@@ -113,6 +124,26 @@ func (albumData IAlbumProps)DbCreateAlbm()(int64, error){
         return 0, fmt.Errorf("addAlbum: %v", err)
     }
     return id, nil
+}
+
+func DbLoadAllAlbums()([]IAlbumDB, error){
+    albums := []IAlbumDB{}
+
+    rows, err := db.Query("SELECT * FROM album")
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+    // Loop through rows, using Scan to assign column data to struct fields.
+    for rows.Next() {
+        alb := IAlbumDB{}
+        if err := rows.Scan(&alb.ID, &alb.Title, &alb.Artist, &alb.Price); err != nil {
+            return nil, err
+        }
+        albums = append(albums, alb)
+    }
+
+    return albums, nil
 }
 
 func validator[T any](dataObj T)error{
