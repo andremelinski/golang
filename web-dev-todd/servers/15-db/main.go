@@ -22,7 +22,7 @@ type IAlbumProps struct {
     Price  float32 `json:"price" valid:"notnull"`
 }
 type IAlbumDB struct{
-    ID     int64
+    ID     int64 
     IAlbumProps
 }
 
@@ -73,12 +73,21 @@ func main() {
 
 func HandleRequests(){
     mux := httprouter.New()
-	mux.POST("/", CreateAlbum)
-	mux.GET("/", GetAllAlbums)
-	mux.GET("/album/:id", GetAlbumById)
-    mux.PUT("/album/:id", UpdateAlbum)
-	mux.DELETE("/album/:id", DeleteAlbum)
+	mux.POST("/", middlewareContentType(CreateAlbum))
+	mux.GET("/", middlewareContentType(GetAllAlbums))
+	mux.GET("/album/:id", middlewareContentType(GetAlbumById))
+    mux.PUT("/album/:id", middlewareContentType(UpdateAlbum))
+	mux.DELETE("/album/:id", middlewareContentType(DeleteAlbum))
 	log.Fatal(http.ListenAndServe(":8080", mux))
+}
+
+func middlewareContentType(next httprouter.Handle) httprouter.Handle {
+    return func(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
+        res.Header().Set("Content-Type", "application/json")
+        if next != nil {
+            next(res, req, p)
+        }
+    }
 }
 
 func CreateAlbum(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -101,7 +110,6 @@ func CreateAlbum(res http.ResponseWriter, req *http.Request, _ httprouter.Params
         return 
     }
 
-    res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusOK)
 	json.NewEncoder(res).Encode(newAlbumId)
 }
@@ -112,7 +120,6 @@ func GetAllAlbums(res http.ResponseWriter, req *http.Request, _ httprouter.Param
         http.Error(res, err.Error(), 500)
         return 
     }
-    res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusOK)
 	json.NewEncoder(res).Encode(albums)
 }
@@ -123,7 +130,6 @@ func GetAlbumById(res http.ResponseWriter, _ *http.Request, param httprouter.Par
         http.Error(res, err.Error(), 500)
         return 
     }
-    res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusOK)
 	json.NewEncoder(res).Encode(album)
 }
@@ -144,7 +150,6 @@ func UpdateAlbum(res http.ResponseWriter, req *http.Request, param httprouter.Pa
         return 
     }
 
-    res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusOK)
 	json.NewEncoder(res).Encode(rowsUpdated)
 }
@@ -158,7 +163,6 @@ func DeleteAlbum(res http.ResponseWriter, req *http.Request, param httprouter.Pa
         return 
     }
 
-    res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusOK)
 	json.NewEncoder(res).Encode(rowsDeleted)
 }
@@ -178,8 +182,8 @@ func (albumDB IAlbumDB)DbCreateAlbm(albumData IAlbumProps)(int64, error){
     return id, nil
 }
 
-func(albumDb IAlbumDB) DbLoadAllAlbums()(*[]IAlbumDB, error){
-    albums := &[]IAlbumDB{}
+func(albumDb IAlbumDB) DbLoadAllAlbums()(*[]IAlbumProps, error){
+    albums := &[]IAlbumProps{}
 
     rows, err := db.Query("SELECT * FROM album")
     if err != nil {
@@ -188,8 +192,8 @@ func(albumDb IAlbumDB) DbLoadAllAlbums()(*[]IAlbumDB, error){
     defer rows.Close()
     // Loop through rows, using Scan to assign column data to struct fields.
     for rows.Next() {
-        alb := IAlbumDB{}
-        if err := rows.Scan(&alb.ID, &alb.Title, &alb.Artist, &alb.Price); err != nil {
+        alb := IAlbumProps{}
+        if err := rows.Scan(&alb.Title, &alb.Artist, &alb.Price); err != nil {
             return nil, err
         }
         *albums = append(*albums, alb)
@@ -198,13 +202,13 @@ func(albumDb IAlbumDB) DbLoadAllAlbums()(*[]IAlbumDB, error){
     return albums, nil
 }
 
-func(albumDb IAlbumDB) DbLoadAlbumById(id string)(*IAlbumDB, error){
+func(albumDb IAlbumDB) DbLoadAlbumById(id string)(*IAlbumProps, error){
     row := db.QueryRowContext(context.TODO(), "SELECT * FROM album WHERE id=?", id)
     err := row.Scan(&albumDb.ID, &albumDb.IAlbumProps.Title, &albumDb.IAlbumProps.Artist, &albumDb.IAlbumProps.Price)
     if err != nil {
         return nil, err
     }
-    return &albumDb, nil
+    return &albumDb.IAlbumProps, nil
 }
 
 func(albumDb IAlbumDB) DbUpdateAlbum(albumData IAlbumProps, id string)(int64, error){
