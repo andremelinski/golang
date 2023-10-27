@@ -1,3 +1,4 @@
+# https://go.dev/doc/tutorial/database-access
 version: '3.6'
 services:
   db:
@@ -30,6 +31,5 @@ volumes: # add volume to persist data.
   #   extra_hosts:
   #   - "host.docker.internal:host-gateway"
 #  /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P aqui_123
-# /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U SA -P aqui_123
+
 # https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker?view=sql-server-ver15&preserve-view=true&pivots=cs1-bash
-# https://go.dev/doc/tutorial/database-access

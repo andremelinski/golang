@@ -77,7 +77,7 @@ func HandleRequests(){
 	mux.GET("/", GetAllAlbums)
 	mux.GET("/album/:id", GetAlbumById)
     mux.PUT("/album/:id", UpdateAlbum)
-	// mux.DELETE("/album/:id", DeleteAlbum)
+	mux.DELETE("/album/:id", DeleteAlbum)
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }
 
@@ -138,7 +138,7 @@ func UpdateAlbum(res http.ResponseWriter, req *http.Request, param httprouter.Pa
 		return 
     }
 
-   albumUpdated, err := albumDB.DbUpdateAlbum(albumData, albumId)
+   rowsUpdated, err := albumDB.DbUpdateAlbum(albumData, albumId)
    if(err != nil) {
         http.Error(res, err.Error(), 500)
         return 
@@ -146,7 +146,21 @@ func UpdateAlbum(res http.ResponseWriter, req *http.Request, param httprouter.Pa
 
     res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusOK)
-	json.NewEncoder(res).Encode(albumUpdated)
+	json.NewEncoder(res).Encode(rowsUpdated)
+}
+
+func DeleteAlbum(res http.ResponseWriter, req *http.Request, param httprouter.Params){
+    albumId := param.ByName("id")
+    rowsDeleted, err := albumDB.DbdeleteAlbum(albumId)
+
+    if(err != nil) {
+        http.Error(res, err.Error(), 500)
+        return 
+    }
+
+    res.Header().Set("Content-Type", "application/json")
+	res.WriteHeader(http.StatusOK)
+	json.NewEncoder(res).Encode(rowsDeleted)
 }
 
 func (albumDB IAlbumDB)DbCreateAlbm(albumData IAlbumProps)(int64, error){
@@ -224,7 +238,7 @@ func(albumDb IAlbumDB) DbUpdateAlbum(albumData IAlbumProps, id string)(int64, er
     albumUpdated, err := db.Exec(updateConditition)
 
         if err != nil {
-        return 0, fmt.Errorf("addAlbum: %v", err)
+        return 0, fmt.Errorf("albumUpdated: %v", err)
     }
 
 	row, err := albumUpdated.RowsAffected()
@@ -233,7 +247,20 @@ func(albumDb IAlbumDB) DbUpdateAlbum(albumData IAlbumProps, id string)(int64, er
             return 0, fmt.Errorf("RowsAffected in updateAlbum: %v", err)
         }
     return row, nil
-    
+}
+
+func(albumDb IAlbumDB) DbdeleteAlbum(id string)(int64, error){
+  albumdeleted, err := db.Exec("DELETE FROM customer where id=?", id)  
+   if err != nil {
+        return 0, fmt.Errorf("albumdeleted: %v", err)
+    }
+
+	row, err := albumdeleted.RowsAffected()
+
+    if err != nil {
+            return 0, fmt.Errorf("RowsAffected in updateAlbum: %v", err)
+        }
+    return row, nil
 }
 
 func validator[T any](dataObj T)error{
