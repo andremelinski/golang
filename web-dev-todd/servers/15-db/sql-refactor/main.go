@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/andremelinski/web-dev-todd/servers/15-db/sql-refactor/controller"
+	album_controller "github.com/andremelinski/web-dev-todd/servers/15-db/sql-refactor/controller/album"
 	"github.com/andremelinski/web-dev-todd/servers/15-db/sql-refactor/repository"
 	"github.com/go-sql-driver/mysql"
 	"github.com/julienschmidt/httprouter"
@@ -35,8 +35,6 @@ func main() {
     }
     fmt.Println("Connected!")
 
-	
-	
 	HandleRequests(db)
 }
 
@@ -46,9 +44,10 @@ func HandleRequests(db *sql.DB) {
 
 	mux := httprouter.New()
 
-	// get album controllers
-	albumController := controller.InitAlbumControllers(repos.AlbumRepo)
+	// controllers := controller.InitControllers(repos)
 
+	// get album controllers
+	albumController := album_controller.InitAlbumController(repos.AlbumRepo)
 	
 	mux.POST("/", middlewareContentType(albumController.CreateAlbum))
 	// mux.GET("/", middlewareContentType(GetAllAlbums))

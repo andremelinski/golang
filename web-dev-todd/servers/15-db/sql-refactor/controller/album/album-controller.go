@@ -1,4 +1,4 @@
-package controller
+package album_controller
 
 import (
 	"encoding/json"
@@ -11,21 +11,19 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// Controller contains the service, which contains database-related logic, as an injectable dependency, allowing us to decouple business logic from db logic.
-type (
-	// AlbumController represents the controller for operating on the Album resource
-	AlbumController struct{
-		serviceAlbum interfaces.IAlbumRepositoryInterface
-	}
-)
+// Apply Album interface by inheratence
+type AlbumController struct {
+	service interfaces.IAlbumRepositoryInterface
+}
 
-func InitAlbumControllers(albumRepo *data.AlbumRepo) *AlbumController {
+func InitAlbumController(albumRepo *data.AlbumRepo) *AlbumController{
 	return &AlbumController{
-		serviceAlbum: albumRepo,
+		service: albumRepo,
 	}
 }
 
-func (albumController AlbumController) CreateAlbum(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+
+func (albumControllerProps AlbumController) CreateAlbum(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	reqBody, _ := io.ReadAll(req.Body)
 
 	albumData := model.IAlbumProps{}
@@ -33,8 +31,8 @@ func (albumController AlbumController) CreateAlbum(res http.ResponseWriter, req 
 		http.Error(res, err.Error(), 500)
 		return
 	}
-	
-	int, err := albumController.serviceAlbum.DbCreateAlbum(albumData)
+
+	int, err := albumControllerProps.service.DbCreateAlbum(albumData)
 	if(err != nil){
 		json.NewEncoder(res).Encode(err)
 		return 
