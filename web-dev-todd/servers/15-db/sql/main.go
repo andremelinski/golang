@@ -26,14 +26,6 @@ type IAlbumDB struct{
     IAlbumProps
 }
 
-type IAlbumRepository interface{
-    CreateAlbum()
-    GetAllAlbums()
-    GetAlbumById()
-    UpdateAlbum()
-    DeleteAlbum()
-}
-
 var db *sql.DB
 var err error
 
