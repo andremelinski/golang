@@ -9,3 +9,5 @@ type IAlbumRepositoryInterface interface {
 	// DbUpdateByIdAlbum(albumData model.IAlbumProps, id string) (int64, error)
 	// DbDeleteByIdAlbum(id string) (int64, error)
 }
+
+// type IValidator

@@ -9,9 +9,14 @@ import (
 
 	album_controller "github.com/andremelinski/web-dev-todd/servers/15-db/sql-refactor/controller/album"
 	"github.com/andremelinski/web-dev-todd/servers/15-db/sql-refactor/repository"
+	"github.com/asaskevich/govalidator"
 	"github.com/go-sql-driver/mysql"
 	"github.com/julienschmidt/httprouter"
 )
+
+func init(){
+	govalidator.SetFieldsRequiredByDefault(true)
+}
 
 func main() {
 	cfg := mysql.Config{

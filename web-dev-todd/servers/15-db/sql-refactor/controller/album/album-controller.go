@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/andremelinski/web-dev-todd/servers/15-db/sql-refactor/controller/album/validator"
 	"github.com/andremelinski/web-dev-todd/servers/15-db/sql-refactor/data"
 	"github.com/andremelinski/web-dev-todd/servers/15-db/sql-refactor/interfaces"
 	"github.com/andremelinski/web-dev-todd/servers/15-db/sql-refactor/model"
@@ -14,11 +15,13 @@ import (
 // Apply Album interface by inheratence
 type AlbumController struct {
 	service interfaces.IAlbumRepositoryInterface
+	validate validator.Ivalidator
 }
 
 func InitAlbumController(albumRepo *data.AlbumRepo) *AlbumController{
 	return &AlbumController{
 		service: albumRepo,
+		validate: *validator.InitValidator(),
 	}
 }
 
@@ -30,6 +33,11 @@ func (albumControllerProps AlbumController) CreateAlbum(res http.ResponseWriter,
 	if err := json.Unmarshal(reqBody, &albumData); err != nil {
 		http.Error(res, err.Error(), 500)
 		return
+	}
+	isValid := albumControllerProps.validate.AlbumValidator(albumData)
+    if(isValid!=nil){
+		http.Error(res, isValid.Error(), 500)
+		return 
 	}
 
 	int, err := albumControllerProps.service.DbCreateAlbum(albumData)
