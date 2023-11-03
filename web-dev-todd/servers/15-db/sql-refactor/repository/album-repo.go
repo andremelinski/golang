@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 
-	"github.com/andremelinski/web-dev-todd/servers/15-db/sql-refactor/data"
+	"github.com/andremelinski/web-dev-todd/servers/15-db/sql-refactor/repository/data"
 )
 
 type Repositories struct {

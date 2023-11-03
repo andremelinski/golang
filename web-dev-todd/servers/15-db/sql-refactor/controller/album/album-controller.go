@@ -6,9 +6,9 @@ import (
 	"net/http"
 
 	"github.com/andremelinski/web-dev-todd/servers/15-db/sql-refactor/controller/album/validator"
-	"github.com/andremelinski/web-dev-todd/servers/15-db/sql-refactor/data"
 	"github.com/andremelinski/web-dev-todd/servers/15-db/sql-refactor/interfaces"
 	"github.com/andremelinski/web-dev-todd/servers/15-db/sql-refactor/model"
+	"github.com/andremelinski/web-dev-todd/servers/15-db/sql-refactor/repository/data"
 	"github.com/julienschmidt/httprouter"
 )
 
