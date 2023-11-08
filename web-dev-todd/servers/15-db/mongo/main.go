@@ -1,34 +1,52 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
+	"net/http"
 
+	"github.com/andremelinski/web-dev-todd/servers/15-db/mongo/controller"
 	"github.com/andremelinski/web-dev-todd/servers/15-db/mongo/infra"
-	"go.mongodb.org/mongo-driver/bson"
+	"github.com/andremelinski/web-dev-todd/servers/15-db/mongo/repository"
+	"github.com/asaskevich/govalidator"
+	"github.com/julienschmidt/httprouter"
 )
 
+func init(){
+	govalidator.SetFieldsRequiredByDefault(true)
+}
 
 func main() {
 	mongodb, cancel, err := infra.InitDataBaseConnection().ConnectMongoDB()
-	// ctx, cancel := context.WithCancel(context.Background())
-	collection := mongodb.Collection("name")
+	
+	defer cancel()
+	  if(err != nil){
+		  log.Fatalln(err)
+		  return 
+	  }
+	  fmt.Println("Connected!")
+	
+	  repos := repository.InitRepositories(mongodb)
 
-  defer cancel()
+	mux := httprouter.New()
+
+	// get album controllers
+	albumController := controller.InitAlbumController(repos.AlbumRepo)
+	
+	mux.POST("/", middlewareContentType(albumController.CreateAlbum))
+	log.Fatal(http.ListenAndServe(":8080", mux))
+
 	if(err != nil){
 		log.Fatalln(err)
 	}
 
-		res, err := collection.InsertOne(context.Background(), bson.M{"hello": "world"})
+}
 
-	if(err != nil){
-		log.Fatalln(err)
+func middlewareContentType(next httprouter.Handle) httprouter.Handle {
+	return func(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
+		res.Header().Set("Content-Type", "application/json")
+		if next != nil {
+			next(res, req, p)
+		}
 	}
-	id := res.InsertedID
-
-	fmt.Println("Connected!")
-
-		fmt.Println(id)
-
 }
