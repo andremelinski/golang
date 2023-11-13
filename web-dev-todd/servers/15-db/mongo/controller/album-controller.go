@@ -45,5 +45,25 @@ func (albumControllerProps AlbumController) CreateAlbum(res http.ResponseWriter,
 	}
 	res.WriteHeader(http.StatusOK)
 	json.NewEncoder(res).Encode(id)
+}
 
+func (albumControllerProps AlbumController) GetAlbums(res http.ResponseWriter, _ *http.Request, _ httprouter.Params){
+	albums, err := albumControllerProps.service.DbReadAll()
+
+	if(err != nil){
+		json.NewEncoder(res).Encode(err)
+		return 
+	}
+	res.WriteHeader(http.StatusOK)
+	json.NewEncoder(res).Encode(albums)
+}
+func (albumControllerProps AlbumController) GetAlbumById(res http.ResponseWriter, _ *http.Request, params httprouter.Params){
+	album, err := albumControllerProps.service.DbreadByIdAlbum(params.ByName("id"))
+
+	if(err != nil){
+		json.NewEncoder(res).Encode(err)
+		return 
+	}
+	res.WriteHeader(http.StatusOK)
+	json.NewEncoder(res).Encode(album)
 }

@@ -34,6 +34,8 @@ func main() {
 	albumController := controller.InitAlbumController(repos.AlbumRepo)
 	
 	mux.POST("/", middlewareContentType(albumController.CreateAlbum))
+	mux.GET("/", middlewareContentType(albumController.GetAlbums))
+	mux.GET("/:id", middlewareContentType(albumController.GetAlbumById))
 	log.Fatal(http.ListenAndServe(":8080", mux))
 
 	if(err != nil){
