@@ -67,3 +67,27 @@ func (albumControllerProps AlbumController) GetAlbumById(res http.ResponseWriter
 	res.WriteHeader(http.StatusOK)
 	json.NewEncoder(res).Encode(album)
 }
+func (albumControllerProps AlbumController) UpdateByIdAlbum(res http.ResponseWriter, req *http.Request, params httprouter.Params){
+	body, _ := io.ReadAll(req.Body)
+	infoToUPdate := model.IAlbumProps{}
+	
+	json.Unmarshal(body, &infoToUPdate)
+	album, err := albumControllerProps.service.DbUpdateByIdAlbum(params.ByName("id"), &infoToUPdate)
+
+	if(err != nil){
+		json.NewEncoder(res).Encode(err)
+		return 
+	}
+	res.WriteHeader(http.StatusOK)
+	json.NewEncoder(res).Encode(album)
+}
+func (albumControllerProps AlbumController) DeleteByIdAlbum(res http.ResponseWriter, _ *http.Request, params httprouter.Params){
+	album, err := albumControllerProps.service.DbDeleteByIdAlbum(params.ByName("id"))
+
+	if(err != nil){
+		json.NewEncoder(res).Encode(err)
+		return 
+	}
+	res.WriteHeader(http.StatusOK)
+	json.NewEncoder(res).Encode(album)
+}

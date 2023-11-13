@@ -36,6 +36,8 @@ func main() {
 	mux.POST("/", middlewareContentType(albumController.CreateAlbum))
 	mux.GET("/", middlewareContentType(albumController.GetAlbums))
 	mux.GET("/:id", middlewareContentType(albumController.GetAlbumById))
+	mux.PUT("/:id", middlewareContentType(albumController.UpdateByIdAlbum))
+	mux.DELETE("/:id", middlewareContentType(albumController.DeleteByIdAlbum))
 	log.Fatal(http.ListenAndServe(":8080", mux))
 
 	if(err != nil){

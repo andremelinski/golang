@@ -6,6 +6,6 @@ type IAlbumRepositoryInterface interface {
 	DbCreateAlbum(albumData model.IAlbumProps) (interface{}, error)
 	DbReadAll() (*[]model.IAlbumDB, error)
 	DbreadByIdAlbum(id string) (*model.IAlbumProps, error)
-	// DbUpdateByIdAlbum(albumData model.IAlbumProps, id string) (int64, error)
-	// DbDeleteByIdAlbum(id string) (int64, error)
+	DbUpdateByIdAlbum(id string, albumData *model.IAlbumProps, ) (*model.IAlbumProps, error)
+	DbDeleteByIdAlbum(id string) (*model.IAlbumDB, error)
 }
