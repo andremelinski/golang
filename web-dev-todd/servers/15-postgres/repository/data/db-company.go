@@ -3,6 +3,8 @@ package data
 import (
 	"database/sql"
 	"fmt"
+
+	"github.com/andremelinski/web-dev-todd/servers/15-postgres/domain/interfaces"
 )
 
 type DbCompanyRepo struct {
@@ -15,16 +17,7 @@ func NewDbCompanyRepo(db *sql.DB)*DbCompanyRepo{
 	}
 }
 
-type ICompanyProps struct {
-	Name string `json:name`
-}
-
-type ICompanyDb struct {
-	Id int64 `json:id`
-	ICompanyProps
-}
-
-func(companyRepo DbCompanyRepo) CreateCompany(companyProps ICompanyProps)(int64, error){
+func(companyRepo DbCompanyRepo) CreateCompany(companyProps interfaces.ICompanyProps)(int64, error){
 	newCompany, err := companyRepo.db.Exec("INSERT INTO company(name) VALUES (?)", companyProps.Name)
 	if err != nil {
 		return 0, err
@@ -35,4 +28,24 @@ func(companyRepo DbCompanyRepo) CreateCompany(companyProps ICompanyProps)(int64,
         return 0, fmt.Errorf("LastInsertId in addAlbum: %v", err)
     }
 	return companyId, nil
+}
+
+func(companyRepo DbCompanyRepo) GetCompanies()([]interfaces.ICompanyDb, error){
+	companies := []interfaces.ICompanyDb{}
+	rows, err := companyRepo.db.Query("SELECT * FROM company")
+	defer rows.Close() 
+	if err != nil {
+		return companies, err
+	}
+
+	for rows.Next(){
+		company := interfaces.ICompanyDb{}
+		if err := rows.Scan(&company.Id, &company.Name); err != nil {
+            return nil, err
+        }
+        companies = append(companies, company)
+	}
+
+	return companies, nil
+
 }

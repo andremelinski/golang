@@ -7,6 +7,7 @@ import (
 
 	"github.com/andremelinski/web-dev-todd/servers/15-postgres/controller"
 	"github.com/andremelinski/web-dev-todd/servers/15-postgres/infra"
+	"github.com/andremelinski/web-dev-todd/servers/15-postgres/repository"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -19,17 +20,16 @@ func main() {
 	}
 	fmt.Println("Connected!")
 
-	// repos := repository.InitRepositories(sqlDb)
-	// repos.CompanyRepo
+	repos := repository.InitRepositories(sqlDb)
 	mux := httprouter.New()
 
-	// get album controllers
-	controllers := controller.InitControllers(sqlDb)
+	// controller file deleted once its not ok pass db info in a controller layer
+	companyController := controller.InitCompanyController(*repos.CompanyRepo)
 
 	// Company
-	mux.POST("/", middlewareContentType(controllers.TablesDb.CreateDbTables))
-	mux.POST("/company", middlewareContentType(controllers.CompanyController.CreateCompanyController))
-	// mux.GET("/company", middlewareContentType(controllers.companyController.GetCompanys))
+	mux.POST("/", middlewareContentType(controller.NewCreateTables(sqlDb).CreateDbTables))
+	mux.POST("/company", middlewareContentType(companyController.CreateCompanyController))
+	mux.GET("/company", middlewareContentType(companyController.GetCompaniesController))
 	// mux.GET("/company/:id", middlewareContentType(controllers.companyController.GetCompanyById))
 	// mux.PUT("/company/:id", middlewareContentType(controllers.companyController.UpdateByIdCompany))
 	// mux.DELETE("/company/:id", middlewareContentType(controllers.companyController.DeleteByIdCompany))
